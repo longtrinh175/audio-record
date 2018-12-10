@@ -37,7 +37,7 @@ export default class App extends React.Component {
 	}
 
 	componentDidMount() {
-		setTimeout(this._askForPermission, 3000)
+		setTimeout(this._askForPermission, 1000)
 	}
 
 	_askForPermission = async () => {
@@ -169,7 +169,7 @@ export default class App extends React.Component {
 		this.sound = sound
 		this.setState(prevState => {
 			return {
-				isLoaded: false
+				isLoading: false
 			}
 		})
 	}
@@ -285,7 +285,7 @@ export default class App extends React.Component {
 		) {
 			return `${this._getMMSSFromMillis(this.state.positionMillis)} / ${this._getMMSSFromMillis(this.state.durationMillis)}`
 		}
-		return ''
+		return `${this._getMMSSFromMillis(0)}`
 	}
 
 	_getRecordingTimeStamps = () => {
@@ -299,8 +299,97 @@ export default class App extends React.Component {
 		return (
 			<View style={styles.container}>
 				{!this.state.haveRecordingPermissions
-					? <Text>allo</Text>
-					: <Text>bllo</Text>
+					? 	<View>
+							<Text>You must enable audio permission in order to use this app</Text>
+						</View>
+					: 	<View>
+							<View style={{alignItems: 'center'}}>
+								<Text>Recording</Text>
+							</View>
+							<View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+								<TouchableHighlight
+									onPress={this._onRecordPressed}
+									disabled={this.state.isLoading}
+								>
+									<View>
+										<Icon.MaterialCommunityIcons name='record'  size={30} color='black' />
+									</View>
+								</TouchableHighlight>
+								<View>
+									{!this.state.isRecording && 
+										<Icon.MaterialCommunityIcons name='record-rec'  size={30} color='red' />
+									}
+								</View>				
+							</View>
+							<View style={{alignItems: 'center'}}>
+								<Text>
+									{this._getRecordingTimeStamps()}
+								</Text>
+							</View>
+							<View style={{alignItems: 'center'}}>
+								<Text>playback</Text>
+							</View>
+							<View>
+								<Slider 
+									value={this._getSeekSliderPosition()}
+									onValueChange={this._onSeekSliderValueChange}
+									onSlidingComplete={this._onSeekSliderSlidingComplete}
+									disabled={this.state.isPlaybackAllowed || this.state.isLoading}
+								/>
+								<View style={{alignItems: 'center'}}>
+									<Text>
+										{this._getPlaybackTimeStamps()}
+									</Text>
+								</View>
+							</View>
+
+							<View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+								<View style={{width: 30, height: 30}}/>
+								<TouchableHighlight
+									onPress={this._onPlayPausePressed}
+									disabled={!this.state.isPlaybackAllowed || this.state.isLoading}
+								>
+									<View>
+										{!this.state.isPlaying
+											? <Icon.FontAwesome name='play' size={30} color='black' />
+											: <Icon.FontAwesome name='pause' size={30} color='black' />
+										}
+									</View>
+								</TouchableHighlight>
+								<TouchableHighlight
+									onPress={this._onStopPressed}
+									disabled={!this.state.isPlaybackAllowed || this.state.isLoading}
+								>
+									<View>
+										<Icon.FontAwesome name='stop' size={30} color='black'/>
+									</View>
+								</TouchableHighlight>
+							</View>
+
+							<View style={{alignItems: 'center'}}>
+								<Text>Volume</Text>
+							</View>
+							
+							<View>
+								<TouchableHighlight
+									onPress={this._onMutePressed}
+									disabled={!this.state.isPlaybackAllowed || this.state.isLoading}
+								>
+									<View>
+										{this.state.isMuted
+											? <Icon.Octicons name='mute' size={20} color='black'/>
+											: <Icon.Octicons name='unmute' size={20} color='black'/>
+										}
+									</View>
+								</TouchableHighlight>
+								<Slider 
+									value={1}
+									onValueChange={this._onVolumeSliderValueChange}
+									disabled={!this.state.isPlaybackAllowed || this.state.isLoading}
+								/>
+				
+							</View>
+						</View>
 				}
 			</View>
 		)
@@ -311,89 +400,6 @@ const styles = StyleSheet.create({
 	container: {
 		flex: 1, 
 		flexDirection: 'column', 
-		justifyContent: 'center', 
-		alignItems: 'center'
+		justifyContent: 'center'
 	},
 })
-// {!this.state.haveRecordingPermissions 
-// 	? 	<View style={styles.container}>
-// 			<Text>You must enable audio permission in order to use this app</Text>
-// 		</View>
-// 	:	<View style={styles.container}>
-// 			<View>
-// 				<TouchableHighlight
-// 					onPress={this._onRecordPressed}
-// 					disabled={this.state.isLoading}
-// 				>
-// 					<View>
-// 						<Icon.MaterialCommunityIcons name='record'  size={30} color='red' />
-// 					</View>
-// 				</TouchableHighlight>
-// 				>
-// 				<View>
-// 					{this.state.isRecording && 
-// 						<Icon.MaterialCommunityIcons name='record-rec'  size={30} color='red' />
-// 					}
-// 				</View>
-// 				<View>
-// 					<Text>
-// 						{this._getRecordingTimeStamps()}
-// 					</Text>
-// 				</View>
-// 			</View>
-// 			<View>
-// 					<Slider 
-// 						value={this._getSeekSliderPosition()}
-// 						onValueChange={this._onSeekSliderValueChange}
-// 						onSlidingComplete={this._onSeekSliderSlidingComplete}
-// 						disabled={!this.state.isPlaybackAllowed || this.state.isLoading}
-// 					/>
-// 					<View>
-// 						<Text>
-// 							{this._getPlaybackTimeStamps()}
-// 						</Text>
-// 					</View>
-// 			</View>
-// 			<View>
-// 				<TouchableHighlight
-// 					onPress={this._onMutePressed}
-// 					disabled={!this.state.isPlaybackAllowed || this.state.isLoading}
-// 				>
-// 					<View>
-// 						{this.state.isMuted
-// 							? <Icon.Octicons name='mute' size={20} color='black'/>
-// 							: <Icon.Octicons name='unmute' size={20} color='black'/>
-// 						}
-// 					</View>
-// 				</TouchableHighlight>
-// 				<Slider 
-// 					value={1}
-// 					onValueChange={this._onVolumeSliderValueChange}
-// 					disabled={!this.state.isPlaybackAllowed || this.state.isLoading}
-// 				/>
-
-// 			</View>
-// 			<View>
-// 				<TouchableHighlight
-// 					onPress={this._onPlayPausePressed}
-// 					disabled={!this.state.isPlaybackAllowed || this.state.isLoading}
-// 				>
-// 					<View>
-// 						{this.state.isPlaying
-// 							? <Icon.FontAwesome name='play' size={30} color='black' />
-// 							: <Icon.FontAwesome name='pause' size={30} color='black' />
-// 						}
-// 					</View>
-// 				</TouchableHighlight>
-// 				<TouchableHighlight
-// 					onPress={this._onStopPressed}
-// 					disabled={!this.state.isPlaybackAllowed || this.state.isLoading}
-// 				>
-// 					<View>
-// 						<Icon.FontAwesome name='stop' size={30} color='black'/>
-// 					</View>
-// 				</TouchableHighlight>
-// 			</View>
-// 		</View>				
-// }
-
