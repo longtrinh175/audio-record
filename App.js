@@ -111,11 +111,12 @@ export default class App extends React.Component {
 			this.sound = null
 		}
 		await Expo.Audio.setAudioModeAsync({
+			playThroughEarpieceAndroid: false,
+			shouldDuckAndroid: true,
+			interruptionModeAndroid: Expo.Audio.INTERRUPTION_MODE_ANDROID_DO_NOT_MIX,
 			allowsRecordingIOS: true,
 			interruptionModeIOS: Expo.Audio.INTERRUPTION_MODE_IOS_DO_NOT_MIX,
-			playsInSilentModeIOS: true,
-			shouldDuckAndroid: true,
-			interruptionModeAndroid: Expo.Audio.INTERRUPTION_MODE_ANDROID_DO_NOT_MIX
+			playsInSilentModeIOS: true
 		})
 		if (this.recording !== null) {
 			this.recording.setOnRecordingStatusUpdate(null)
@@ -154,9 +155,10 @@ export default class App extends React.Component {
 			playsInSilentModeIOS: true,
 			playsInSilentLockedModeIOS: true,
 			shouldDuckAndroid: true,
+			playThroughEarpieceAndroid: false,
 			interruptionModeAndroid: Expo.Audio.INTERRUPTION_MODE_ANDROID_DO_NOT_MIX
 		})
-		const { sound, status } = await this.recording.createNewLoadedSound(
+		const { sound, status } = await this.recording.createNewLoadedSoundAsync(
 			{
 				isLooping: true,
 				isMuted: this.state.isMuted,
@@ -175,7 +177,7 @@ export default class App extends React.Component {
 	}
 
 	_onRecordPressed = () => {
-		if (this.state.isRecording) {
+		if (!this.state.isRecording) {
 			this._stopPlaybackAndBeginRecording()
 		} else {
 			this._stopRecordingAndEnablePlayback()
@@ -186,10 +188,11 @@ export default class App extends React.Component {
 		if (this.sound !== null) {
 			if (this.state.isPlaying) {
 				this.sound.pauseAsync()
+
+			} else {
+				this.sound.playAsync()
 			}
-		} else {
-			this.sound.playAsync()
-		}
+		} 
 	}
 
 	_onStopPressed = () => {
@@ -283,7 +286,7 @@ export default class App extends React.Component {
 			this.state.positionMillis !== null &&
 			this.state.soundDuration !== null
 		) {
-			return `${this._getMMSSFromMillis(this.state.positionMillis)} / ${this._getMMSSFromMillis(this.state.durationMillis)}`
+			return `${this._getMMSSFromMillis(this.state.soundPosition)} / ${this._getMMSSFromMillis(this.state.soundDuration)}`
 		}
 		return `${this._getMMSSFromMillis(0)}`
 	}
@@ -316,7 +319,7 @@ export default class App extends React.Component {
 									</View>
 								</TouchableHighlight>
 								<View>
-									{!this.state.isRecording && 
+									{this.state.isRecording && 
 										<Icon.MaterialCommunityIcons name='record-rec'  size={30} color='red' />
 									}
 								</View>				
@@ -334,7 +337,7 @@ export default class App extends React.Component {
 									value={this._getSeekSliderPosition()}
 									onValueChange={this._onSeekSliderValueChange}
 									onSlidingComplete={this._onSeekSliderSlidingComplete}
-									disabled={this.state.isPlaybackAllowed || this.state.isLoading}
+									disabled={!this.state.isPlaybackAllowed || this.state.isLoading}
 								/>
 								<View style={{alignItems: 'center'}}>
 									<Text>
