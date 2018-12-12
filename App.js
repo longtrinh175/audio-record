@@ -22,7 +22,7 @@ export default class App extends React.Component {
 			haveRecordingPermissions: false,
 			isLoading: false,
 			isPlaybackAllowed: false,
-			muted: false,
+			isMuted: false,
 			soundPosition: null,
 			soundDuration: null,
 			recordingDuration: null,
@@ -58,7 +58,7 @@ export default class App extends React.Component {
 					shouldPlay: status.shouldPlay,
 					isPlaying: status.isPlaying,
 					rate: status.rate,
-					muted: status.muted,
+					isMuted: status.isMuted,
 					volume: status.volume,
 					shouldCorrectPitch: status.shouldCorrectPitch,
 					isPlaybackAllowed: true
@@ -374,17 +374,19 @@ export default class App extends React.Component {
 							</View>
 							
 							<View>
-								<TouchableHighlight
-									onPress={this._onMutePressed}
-									disabled={!this.state.isPlaybackAllowed || this.state.isLoading}
-								>
-									<View>
-										{this.state.isMuted
-											? <Icon.Octicons name='mute' size={20} color='black'/>
-											: <Icon.Octicons name='unmute' size={20} color='black'/>
-										}
-									</View>
-								</TouchableHighlight>
+								<View style={{alignItems: 'flex-start'}}>
+									<TouchableHighlight
+										onPress={this._onMutePressed}
+										disabled={!this.state.isPlaybackAllowed || this.state.isLoading}
+									>
+										<View style={{}}>
+											{this.state.isMuted
+												? <Icon.Octicons name='mute' size={20} color='black'/>
+												: <Icon.Octicons name='unmute' size={20} color='black'/>
+											}
+										</View>
+									</TouchableHighlight>
+								</View>
 								<Slider 
 									value={1}
 									onValueChange={this._onVolumeSliderValueChange}
