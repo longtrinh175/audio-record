@@ -10,6 +10,7 @@ import * as Expo from 'expo'
 import * as Icon from '@expo/vector-icons'
 import Playback from './components/Playback'
 import Record from './components/Record'
+import Volume from './components/Volume'
 
 const RATE_SCALE = 3.0
 
@@ -334,6 +335,19 @@ export default class App extends React.Component {
 		}
 	}
 
+	dataVolume() {
+		return {
+			slider: {
+				onValueChange: this._onVolumeSliderValueChange,
+				disabled: !this.state.isPlaybackAllowed || this.state.isLoading
+			},
+			mutedButton: {
+				onPress: this._onMutePressed,
+				disabled: !this.state.isPlaybackAllowed || this.state.isLoading
+			}
+		}
+	}
+
 	render() {
 		return (
 			<View style={styles.container}>
@@ -346,31 +360,7 @@ export default class App extends React.Component {
 
 							<Playback data={this.dataPlayback()} />
 
-							<View style={{alignItems: 'center'}}>
-								<Text>Volume</Text>
-							</View>
-							
-							<View>
-								<View style={{alignItems: 'flex-start'}}>
-									<TouchableHighlight
-										onPress={this._onMutePressed}
-										disabled={!this.state.isPlaybackAllowed || this.state.isLoading}
-									>
-										<View style={{}}>
-											{this.state.isMuted
-												? <Icon.Octicons name='mute' size={20} color='black'/>
-												: <Icon.Octicons name='unmute' size={20} color='black'/>
-											}
-										</View>
-									</TouchableHighlight>
-								</View>
-								<Slider 
-									value={1}
-									onValueChange={this._onVolumeSliderValueChange}
-									disabled={!this.state.isPlaybackAllowed || this.state.isLoading}
-								/>
-				
-							</View>
+							<Volume data={this.dataVolume()} />
 						</View>
 				}
 			</View>
