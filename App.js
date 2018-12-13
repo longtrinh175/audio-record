@@ -343,7 +343,8 @@ export default class App extends React.Component {
 			},
 			mutedButton: {
 				onPress: this._onMutePressed,
-				disabled: !this.state.isPlaybackAllowed || this.state.isLoading
+				disabled: !this.state.isPlaybackAllowed || this.state.isLoading,
+				isMuted: this.state.isMuted
 			}
 		}
 	}
