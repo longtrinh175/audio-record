@@ -39,7 +39,7 @@ const Playback = ({ data }) => {
                 </TouchableHighlight>
                 <TouchableHighlight
                     onPress={stopButton.onPress}
-                    disabled={stop.disabled}
+                    disabled={stopButton.disabled}
                 >
                     <View>
                         <Icon.FontAwesome name='stop' size={30} color='black'/>

@@ -299,23 +299,25 @@ export default class App extends React.Component {
 		return `${this._getMMSSFromMillis(0)}`
 	}
 
-	dataPlayback = {
-		slider: {
-			value: this._getSeekSliderPosition(),
-			onValueChange: this._onSeekSliderValueChange,
-			onSlidingComplete: this._onSeekSliderSlidingComplete,
-			disabled: !this.state.isPlaybackAllowed || this.state.isLoading
-		},
-		isPlaying: this.state.isPlaying,
-		timeStamps: this._getPlaybackTimeStamps(),
-		buttons: {
-			playPauseButton: {
-				onPress: this._onPlayPausePressed,
+	dataPlayback() {
+		return {
+			slider: {
+				value: this._getSeekSliderPosition(),
+				onValueChange: this._onSeekSliderValueChange,
+				onSlidingComplete: this._onSeekSliderSlidingComplete,
 				disabled: !this.state.isPlaybackAllowed || this.state.isLoading
 			},
-			stopButton: {
-				onPress: this._onStopPressed,
-				disabled: !this.state.isPlaybackAllowed || this.state.isLoading
+			isPlaying: this.state.isPlaying,
+			timeStamps: this._getPlaybackTimeStamps(),
+			buttons: {
+				playPauseButton: {
+					onPress: this._onPlayPausePressed,
+					disabled: !this.state.isPlaybackAllowed || this.state.isLoading
+				},
+				stopButton: {
+					onPress: this._onStopPressed,
+					disabled: !this.state.isPlaybackAllowed || this.state.isLoading
+				}
 			}
 		}
 	}
@@ -352,7 +354,7 @@ export default class App extends React.Component {
 								</Text>
 							</View>
 
-							<Playback data={this.dataPlayback} />
+							<Playback data={this.dataPlayback()} />
 
 							<View style={{alignItems: 'center'}}>
 								<Text>Volume</Text>
