@@ -8,6 +8,7 @@ import {
 } from 'react-native';
 import * as Expo from 'expo'
 import * as Icon from '@expo/vector-icons'
+import Playback from './components/Playback'
 
 const RATE_SCALE = 3.0
 
@@ -298,6 +299,27 @@ export default class App extends React.Component {
 		return `${this._getMMSSFromMillis(0)}`
 	}
 
+	dataPlayback = {
+		slider: {
+			value: this._getSeekSliderPosition(),
+			onValueChange: this._onSeekSliderValueChange,
+			onSlidingComplete: this._onSeekSliderSlidingComplete,
+			disabled: !this.state.isPlaybackAllowed || this.state.isLoading
+		},
+		isPlaying: this.state.isPlaying,
+		timeStamps: this._getPlaybackTimeStamps(),
+		buttons: {
+			playPauseButton: {
+				onPress: this._onPlayPausePressed,
+				disabled: !this.state.isPlaybackAllowed || this.state.isLoading
+			},
+			stopButton: {
+				onPress: this._onStopPressed,
+				disabled: !this.state.isPlaybackAllowed || this.state.isLoading
+			}
+		}
+	}
+
 	render() {
 		return (
 			<View style={styles.container}>
@@ -329,45 +351,8 @@ export default class App extends React.Component {
 									{this._getRecordingTimeStamps()}
 								</Text>
 							</View>
-							<View style={{alignItems: 'center'}}>
-								<Text>playback</Text>
-							</View>
-							<View>
-								<Slider 
-									value={this._getSeekSliderPosition()}
-									onValueChange={this._onSeekSliderValueChange}
-									onSlidingComplete={this._onSeekSliderSlidingComplete}
-									disabled={!this.state.isPlaybackAllowed || this.state.isLoading}
-								/>
-								<View style={{alignItems: 'center'}}>
-									<Text>
-										{this._getPlaybackTimeStamps()}
-									</Text>
-								</View>
-							</View>
 
-							<View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-								<View style={{width: 30, height: 30}}/>
-								<TouchableHighlight
-									onPress={this._onPlayPausePressed}
-									disabled={!this.state.isPlaybackAllowed || this.state.isLoading}
-								>
-									<View>
-										{!this.state.isPlaying
-											? <Icon.FontAwesome name='play' size={30} color='black' />
-											: <Icon.FontAwesome name='pause' size={30} color='black' />
-										}
-									</View>
-								</TouchableHighlight>
-								<TouchableHighlight
-									onPress={this._onStopPressed}
-									disabled={!this.state.isPlaybackAllowed || this.state.isLoading}
-								>
-									<View>
-										<Icon.FontAwesome name='stop' size={30} color='black'/>
-									</View>
-								</TouchableHighlight>
-							</View>
+							<Playback data={this.dataPlayback} />
 
 							<View style={{alignItems: 'center'}}>
 								<Text>Volume</Text>
